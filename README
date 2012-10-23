@@ -1,4 +1,7 @@
 23/10/12 Hanan Einav-Levy
 
 loadIMSdata git repository contains code meant for the analysis of the IMS data set from 2006-2012 released in 2012. It is geared towards analyzing the wind data, and is a precursor to the "IsraelDiurnalWindCorrelation" git repository code. 
-Instructions on the use of the code
+Instructions on the use of the code:
+Run plotIMSstations(stationVec,dataDirectory) for processing the IMS data disk producing .mat files for further analysis.
+stationVec is a vector with numbers from 1 to 83
+dataDirectory is an absolut path to the directory where the "IMS-data" directory resides
