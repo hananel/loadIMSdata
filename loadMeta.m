@@ -19,15 +19,15 @@ while condition
         temp = strrep(metaStr{1}(3),'"','');
         name{i} = temp{1};
         % Israel coordinates
-        IsrCoor1(i) = str2num(metaStr{1}(5){1});
-        IsrCoor2(i) = str2num(metaStr{1}(6){1});
+        IsrCoor1(i) = str2num(cell2mat(metaStr{1}(5)));
+        IsrCoor2(i) = str2num(cell2mat(metaStr{1}(6)));
         % long-lat
-        long(i) = str2num(metaStr{1}(7){1});
-        lat(i) = str2num(metaStr{1}(8){1});
+        long(i) = str2num(cell2mat(metaStr{1}(7)));
+        lat(i) = str2num(cell2mat(metaStr{1}(8)));
         % heights
-        hAbsolute(i) = str2num(metaStr{1}(9){1});
-        if ~isempty(str2num(metaStr{1}(11){1}))
-            hGround(i) = str2num(metaStr{1}(11){1});
+        hAbsolute(i) = str2num(cell2mat(metaStr{1}(9)));
+        if ~isempty(str2num(cell2mat(metaStr{1}(11))))
+            hGround(i) = str2num(cell2mat(metaStr{1}(11)));
         else
             hGround(i) = -1; % designates no data
         end
@@ -36,7 +36,7 @@ while condition
             anemometer{i} = 'No';
             %keyboard; 
         else
-            anemometer{i} = metaStr{1}(12){1};
+            anemometer{i} = cell2mat(metaStr{1}(12));
         end
     end
     i = i + 1; 

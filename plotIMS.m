@@ -23,6 +23,7 @@ end
 
 pathname = [dataDirectory,'/IMS-data/STATIONS DATA/',meta.name,'/',meta.name,'/'];
 matFile = [pathname, 'Data_',num2str(Num),'.mat'];
+dataDirectoryOrig = dataDirectory;
 if isempty(dir(matFile))
     % load data from station directory
     counter = 1;
@@ -77,9 +78,12 @@ end
 % loading workspace
 disp('loading matFile')
 load(matFile);
+dataDirectory = dataDirectoryOrig;
+pathname = [dataDirectory,'/IMS-data/STATIONS DATA/',meta.name,'/',meta.name,'/'];
+matFile = [pathname, 'Data_',num2str(Num),'.mat'];
 
 % Parsing data
-t = datenum(y,m,d,h,mi);
+t = datenum(y,m,d,h,mi,0);
 Ustd = (Ugust-U)/3; % not real std - assuming STD = (max-avg)/3
 % histogram
 [y,x] = hist(U,0.5:25);
@@ -104,7 +108,7 @@ title('histogram')
 E = sum(0.5*1.2*x.^3.*y)/sum(y); %[watt/m^2]
 title(['Histogram. Power density = ',num2str(E,3), ' [Watt/m^2]']);
 xlabel('U [m/s]')
-print([num2str(Num), '_diurnal_',strrep(meta.name,' ',''),'.pdf'],'-append')
+print([num2str(Num), '_diurnal_',strrep(meta.name,' ',''),'.ps'],'-append')
 
 % diurnal plot for each month
 dailyAvgTime = 1/6; % [hr]
@@ -115,7 +119,7 @@ monthString = {'January','February','March','April','May','June','July','August'
 col = jet(12);
 for month=1:12
     for i=1:length(tDaily)-1
-        loc = find(and(hTot>=tDaily(i),hTot<=tDaily(i+1),m==month));
+        loc = find(and(hTot>=tDaily(i),and(hTot<=tDaily(i+1),m==month)));
         UDaily(month,i) = nanmean(U(loc));
         UStdDaily(month,i) = nanstd(U(loc));
         directionDaily(month,i) = nanmean(direction(loc));
