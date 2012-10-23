@@ -19,6 +19,7 @@ while condition
         temp = strrep(metaStr{1}(3),'"','');
         name{i} = temp{1};
         % Israel coordinates
+        keyboard;
         IsrCoor1(i) = str2num(metaStr{1}(5){1});
         IsrCoor2(i) = str2num(metaStr{1}(6){1});
         % long-lat

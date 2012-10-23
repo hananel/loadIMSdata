@@ -1,15 +1,15 @@
 % Project: GreenBuildingCFD
 % purpose: use IMS data (or more data when available) to gather the closest 3 stations and present their wind rose, histogram and diurnal cycle for 4 months a year.
+% usage: reportWindRegime(lat0,long0,stationNum,Ulimit)
 
-
-function reportWindRegime(lat,long,stationNum,Ulimit)
+function reportWindRegime(lat0,long0,stationNum,Ulimit)
 % returns basic wind regime for lat,long from 3 closest stations
 % as a pdf report and png graphs, and data in struct s
 
 global dataDirectory
-dataDirectory = '/home/hanan/Documents/measurements/'
+dataDirectory = '/home/hanan/Documents/measurements'
 global resultsDirectory
-resultsDirectory = '/home/hanan/Documents/measurements/';
+resultsDirectory = '/home/hanan/Documents/measurements';
 debug_on_warning(0);
 debug_on_error(0);
 more off;
@@ -32,7 +32,7 @@ figure(100);
 subplot(2,2,[1,3]);
 plotIsraelBorders
 axis tight; hold on;
-g = plot(long,lat,'or','markersize',6);
+g = plot(long0,lat0,'or','markersize',6);
 set(g,'markerfacecolor','r')
 ax = get(gcf); 
 set(ax.children,'position',[0.05000   0.11000   0.43466   0.81500]);
@@ -43,7 +43,7 @@ for i=1:length(meta)
     if yesAnemometer
         text(meta(i).long,meta(i).lat,num2str(meta(i).num),'color','g');
         % building distance vector
-        distance(i) = haversine(meta(i).lat,meta(i).long,lat,long);
+        distance(i) = haversine(meta(i).lat,meta(i).long,lat0,long0);
     else
         text(meta(i).long,meta(i).lat,num2str(meta(i).num),'color','b');
         distance(i) = 999;
@@ -57,7 +57,7 @@ distanceOrig = distance;
 
 for i=1:stationNum
     text(meta(stations(i)).long,meta(stations(i)).lat,num2str(meta(stations(i)).num),'color','r','fontweight','bold')
-    plot([long meta(stations(i)).long],[lat meta(stations(i)).lat],'r');
+    plot([long0 meta(stations(i)).long],[lat0 meta(stations(i)).lat],'r');
 end 
 xlabel('longitude [deg]'); ylabel('latitude [deg]'); title('IMS stations');
 
@@ -66,11 +66,11 @@ zoomDistance = 0.3; % [deg]
 ax = subplot(2,2,4);
 plotIsraelBorders
 axis tight; hold on;
-g = plot(long,lat,'or','markersize',6);
+g = plot(long0,lat0,'or','markersize',6);
 set(g,'markerfacecolor','r')
 for i=1:length(meta)
     % checking if the station is within the zoom area
-    yesZoom = distanceOrig(i)<(0.75*haversine(lat,long,lat+zoomDistance,long+zoomDistance));
+    yesZoom = distanceOrig(i)<(0.75*haversine(lat0,long0,lat0+zoomDistance,long0+zoomDistance));
     % checking for anemometer
     yesAnemometer = not(or(strcmp(meta(i).anemometer,'No'),meta(i).h(2)==-1));
     if yesZoom
@@ -85,26 +85,27 @@ end
 % finding the first stationNum stations
 for i=1:stationNum
     text(meta(stations(i)).long,meta(stations(i)).lat,num2str(meta(stations(i)).num),'color','r','fontweight','bold')
-    plot([long meta(stations(i)).long],[lat meta(stations(i)).lat],'r');
+    plot([long0 meta(stations(i)).long],[lat0 meta(stations(i)).lat],'r');
 end 
 xlabel('longitude [deg]'); ylabel('latitude [deg]'); title('Zoom in on close stations');
-axis([long-zoomDistance long+zoomDistance lat-zoomDistance lat+zoomDistance])
+axis([long0-zoomDistance long0+zoomDistance lat0-zoomDistance lat0+zoomDistance])
 
 % report of location of closest 3 stations
 subplot(2,2,2);
 axis([0 1 0 1],'off');
-text(-0.1,0.9,['The location of the building is ',num2str(long,4),'/',num2str(lat,4)]);
+text(-0.1,0.9,['For location ',num2str(long0,4),'/',num2str(lat0,4)]);
 text(-0.1,0.8,['The closest ',num2str(stationNum),' meteorological stations with ']);
 text(-0.1,0.7,'long term wind data are:');
 for i=1:stationNum
-    text(-0.1,0.6-i*0.2,[num2str(meta(stations(i)).num),': ',meta(stations(i)).name,' ', num2str(distance(i),2),' km away']);
-    text(-0.1,0.6-i*0.2-0.1,['with anemometer at ', num2str(meta(stations(i)).h(2)), ' meter']);
+    text(-0.1,0.5-i*0.15,[num2str(meta(stations(i)).num),': ',meta(stations(i)).name,' ', num2str(distance(i),2),' km away']);
+    text(-0.1,0.5-i*0.15-0.1,['with anemometer at ', num2str(meta(stations(i)).h(2)), ' meter']);
 end
 
 % print report
-reportDirectory = ['lat_',num2str(lat,4),'_long_',num2str(long,4)];
+reportDirectory = ['lat_',num2str(lat0,4),'_long_',num2str(long0,4)];
+reportDirectoryOld = reportDirectory;
 mkdir(resultsDirectory,reportDirectory);
-print([resultsDirectory,'/',reportDirectory,'/IMS_stations_near_long_', num2str(long,4),'_lat_',num2str(lat,4),'.png']);
+print([resultsDirectory,'/',reportDirectory,'/IMS_stations_near_long_', num2str(long0,4),'_lat_',num2str(lat0,4),'.png']);
 
 % 2
 %
@@ -112,7 +113,7 @@ print([resultsDirectory,'/',reportDirectory,'/IMS_stations_near_long_', num2str(
 % TODO - at the moment this is for the average day of each month. should be representative enough, but I should compare to IMS publications.
 disp(['report for ',num2str(stationNum),' stations'])
 metaAll = meta;
-
+resultsDirectoryOld = resultsDirectory;
 if nargin>3
     % comparison to maximum winter (february 2010) and summer (august 2010) consumption
     % loading IEC consumption trend
@@ -148,7 +149,8 @@ if nargin>3
     datetick('x',15,'keeplimits','keepticks');
 end
 legendText = {};
-col = jet(stationNum);
+colOld = rainbow(12);
+dataDirectoryOld = dataDirectory;
 for Num=stations(1:stationNum)
     % load data
     pathname = [dataDirectory,'/IMS-data/STATIONS DATA/',metaAll(Num).name,'/',metaAll(Num).name,'/'];
@@ -159,6 +161,9 @@ for Num=stations(1:stationNum)
         clear Umonthly;
     end
     load(matFile);
+    col = colOld; dataDirectory = dataDirectoryOld;
+    reportDirectory = reportDirectoryOld;
+    resultsDirectory = resultsDirectoryOld;
     M = length(tDaily)-1;
     % make station directory
     stationDirectory = strrep(meta.name,' ','');
@@ -235,7 +240,7 @@ for Num=stations(1:stationNum)
         ax = errorbar(tDaily(1:M)/24,UDaily(month,1:M),UStdDaily(month,1:M));
         set(ax,'color',col(month,:))
         set(gca,"xtick",[0,0.25,0.5,0.75,1])
-        title(sprintf(['Inter annual monthly average diurnal wind speed [m/s] from ',meta.name, ' for ', monthString{month}]));
+        title([{'Inter annual monthly average diurnal wind speed [m/s]'},{[meta.name ' , ', monthString{month}]}]);
         xlabel('Hour'); ylabel('U [m/s]'); 
         axis([0,1,0,nanmax(nanmax(UDaily)+nanmax(UStdDaily))])
         datetick('x',15,'keeplimits','keepticks');
@@ -259,7 +264,7 @@ for Num=stations(1:stationNum)
         % print
         print([resultsDirectory,'/',reportDirectory,'/',stationDirectory,'/Diurnal_month_', monthString{month},'.png']);
         
-        figure(200+month+12*Num);
+        figure(200+month+12*Num); close all;
         % plotting wind rose
         title(['wind rose from ',meta.name, ' for ', monthString{month}]);
         axis off
@@ -276,7 +281,7 @@ for Num=stations(1:stationNum)
     
 
     % wind rose of all year, calculating for simulation input parameters
-    figure(1000); clf
+    figure(1000); close all;
     title(['wind rose from ',meta.name, ' for ', datestr(t(1)), ' to ' , datestr(t(end))]);
     axis off;
     [handles, data, Ag] = wind_rose(direction+180,U,'dtype','meteo','di',0:25);

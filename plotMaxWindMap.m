@@ -1,6 +1,6 @@
 function plotMaxWindMap(stations,directory)
 % creats a contour map of the time for maximum wind speed
-% two flabors:
+% two flavors:
 % 1. irelevant of station charestraistics
 %    a. according to maximum occurance
 %    b. according to the maximum of a gaussian fit.

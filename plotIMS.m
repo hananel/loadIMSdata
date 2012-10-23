@@ -129,7 +129,7 @@ for month=1:12
     figure(month); subplot(121);
     ax = errorbar(tDaily(1:M)/24,UDaily(month,1:M),UStdDaily(month,1:M));
     set(ax,'color',col(month,:))
-    set(gca,"xtick",[0,0.25,0.5,0.75,1])
+    set(gca,'xtick',[0,0.25,0.5,0.75,1])
     title(['U diurnal [m/s] for ', monthString{month}]);
     xlabel('Hour'); ylabel('U [m/s]'); 
     axis([0,1,0,nanmax(nanmax(UDaily)+nanmax(UStdDaily))])
@@ -153,7 +153,7 @@ for month=1:12
 end
 
 subplot(121);
-set(gca,"xtick",[0,0.25,0.5,0.75,1])
+set(gca,'xtick',[0,0.25,0.5,0.75,1])
 axis([0,1,0,nanmax(nanmax(UDaily))])
 xlabel('Hour'); ylabel('U [m/s]');
 datetick('x',15,'keeplimits','keepticks');
